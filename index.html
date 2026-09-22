@@ -1,656 +1,485 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>🥋 Judo Kids Manager</title>
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.0.0/dist/umd/supabase.min.js"></script>
-  <style>
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, maximum-scale=1">
+<meta name="theme-color" content="#050B18">
+<title>Judo Kids — Gestion des Envois</title>
+<style>
+/* ════════════════════════════════════ TOKENS ════════════════════════════════════ */
+:root{
+  --navy-900:#040A15;
+  --navy-800:#071224;
+  --navy-700:#0B1B33;
+  --navy-600:#122745;
+  --accent:#7C5CFF;
+  --accent-soft:#AF52DE;
+  --accent-deep:#5D3FA6;
+  --bg-1:#1e1547;--bg-2:#141030;--bg-3:#0a0612;
+  --orb-1:#7C5CFF55;--orb-2:#AF52DE3d;--orb-3:#A78BFA33;
+  --success:#32D74B;
+  --warning:#FFD426;
+  --danger:#FF453A;
+  --ink:#F2F6FF;
+  --ink-2:rgba(242,246,255,.66);
+  --ink-3:rgba(242,246,255,.42);
+  --ink-4:rgba(242,246,255,.22);
+  --glass:rgba(255,255,255,.055);
+  --glass-2:rgba(255,255,255,.085);
+  --glass-hi:rgba(255,255,255,.14);
+  --stroke:rgba(255,255,255,.10);
+  --stroke-2:rgba(255,255,255,.18);
+  --g-hi:rgba(255,255,255,.11);
+  --g-mid:rgba(255,255,255,.045);
+  --g-lo:rgba(255,255,255,.018);
+  --g-edge:rgba(255,255,255,.15);
+  --g-spec:rgba(255,255,255,.30);
+  --sat:200%;
+  --r-xs:10px;--r-sm:14px;--r-md:20px;--r-lg:26px;--r-full:999px;
+  --shadow-sm:0 2px 10px rgba(0,0,0,.28);
+  --shadow-md:0 12px 34px rgba(0,0,0,.38);
+  --shadow-lg:0 28px 70px rgba(0,0,0,.52);
+  --glow:0 0 0 1px rgba(124,92,255,.35),0 10px 40px rgba(124,92,255,.28);
+  --blur:42px;
+  --spring:cubic-bezier(.22,1,.36,1);
+  --snap:cubic-bezier(.32,.72,0,1);
+  --font:-apple-system,BlinkMacSystemFont,"SF Pro Display","SF Pro Text","Segoe UI",Inter,system-ui,sans-serif;
+  --mono:"SF Mono",ui-monospace,"JetBrains Mono",Menlo,monospace;
+  --safe-b:env(safe-area-inset-bottom,0px);
+}
 
-    body {
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', sans-serif;
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
-      min-height: 100vh;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 20px;
-    }
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{height:100%}
+body{font-family:var(--font);background:var(--navy-900);color:var(--ink);overflow:hidden;-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility;letter-spacing:-.011em}
+button,input,select,textarea{font-family:inherit;font-size:inherit;color:inherit;letter-spacing:inherit}
+button{background:none;border:none;cursor:pointer}
+::selection{background:rgba(124,92,255,.35)}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px;border-radius:6px}
 
-    .container {
-      width: 100%;
-      max-width: 1200px;
-      background: rgba(255, 255, 255, 0.1);
-      backdrop-filter: blur(20px);
-      border: 1px solid rgba(255, 255, 255, 0.2);
-      border-radius: 30px;
-      padding: 50px;
-      box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
-    }
+.ambient{position:fixed;inset:0;z-index:0;overflow:hidden;pointer-events:none;background:radial-gradient(120% 90% at 50% -10%,var(--bg-1) 0%,var(--bg-2) 45%,var(--bg-3) 100%)}
+.orb{position:absolute;border-radius:50%;filter:blur(80px);opacity:.72;animation:drift 26s var(--spring) infinite alternate}
+.orb.a{width:52vmax;height:52vmax;left:-14vmax;top:-16vmax;background:radial-gradient(circle,var(--orb-1),transparent 68%)}
+.orb.b{width:44vmax;height:44vmax;right:-14vmax;top:14vmax;background:radial-gradient(circle,var(--orb-2),transparent 68%);animation-delay:-9s}
+.orb.c{width:40vmax;height:40vmax;left:26vmax;bottom:-20vmax;background:radial-gradient(circle,var(--orb-3),transparent 68%);animation-delay:-16s}
+@keyframes drift{to{transform:translate3d(5vmax,-4vmax,0) scale(1.14)}}
 
-    h1 {
-      color: white;
-      margin-bottom: 40px;
-      text-align: center;
-      font-size: 36px;
-      font-weight: 700;
-    }
+.glass{position:relative;background:linear-gradient(158deg,var(--g-hi) 0%,var(--g-lo) 42%,var(--g-mid) 100%);backdrop-filter:blur(var(--blur)) saturate(var(--sat)) brightness(1.06);-webkit-backdrop-filter:blur(var(--blur)) saturate(var(--sat)) brightness(1.06);border:1px solid var(--g-edge);border-radius:var(--r-lg);box-shadow:var(--shadow-md);overflow:hidden}
+.glass::before{content:'';position:absolute;inset:0;pointer-events:none;background:linear-gradient(158deg,var(--g-spec) 0%,transparent 50%);opacity:.4;border-radius:inherit}
 
-    h2 {
-      color: rgba(255, 255, 255, 0.9);
-      margin-top: 30px;
-      margin-bottom: 20px;
-      font-size: 20px;
-    }
+/* ════════════════════════════════════ LAYOUT ════════════════════════════════════ */
+#root{display:grid;grid-template-columns:280px 1fr;gap:20px;padding:20px;max-width:1800px;margin:0 auto;height:100%;overflow:hidden}
+#app{display:contents}
 
-    .auth-form {
-      background: rgba(255, 255, 255, 0.08);
-      backdrop-filter: blur(10px);
-      border: 1px solid rgba(255, 255, 255, 0.18);
-      padding: 40px;
-      border-radius: 20px;
-      max-width: 420px;
-      margin: 0 auto;
-    }
+/* SIDEBAR */
+aside{display:flex;flex-direction:column;gap:20px;height:100%;overflow:y:auto;padding-right:12px}
+.logo{display:flex;align-items:center;gap:12px;padding:16px;background:var(--glass);border-radius:var(--r-md);margin-bottom:12px}
+.logo .ico{width:40px;height:40px;border-radius:var(--r-sm);background:linear-gradient(145deg,var(--accent),var(--accent-deep));display:grid;place-items:center;color:#fff;font-weight:700;font-size:18px;flex:none}
+.logo h1{font-size:16px;font-weight:700;letter-spacing:-.3px}
+.logo p{font-size:11px;color:var(--ink-3)}
 
-    .form-group {
-      margin-bottom: 20px;
-    }
+.nav-sec{font-size:10px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;color:var(--ink-3);padding:12px 0 4px}
+.nav-btn{display:flex;align-items:center;gap:12px;padding:10px 14px;border-radius:var(--r-sm);background:transparent;color:var(--ink-2);font-weight:530;cursor:pointer;transition:.2s;width:100%;text-align:left;border:1px solid transparent;position:relative}
+.nav-btn:hover{background:var(--glass-2);color:var(--ink)}
+.nav-btn.on{background:var(--glass-hi);color:var(--ink);border-color:var(--stroke-2);box-shadow:var(--glow)}
+.nav-btn i{width:18px;text-align:center;font-style:normal;font-size:16px;flex:none}
+.nav-cnt{margin-left:auto;font-size:11px;background:var(--accent);color:#fff;border-radius:var(--r-full);padding:2px 8px;font-weight:700}
 
-    label {
-      display: block;
-      margin-bottom: 8px;
-      font-weight: 600;
-      color: rgba(255, 255, 255, 0.9);
-      font-size: 13px;
-    }
+.nav-foot{margin-top:auto;padding-top:12px;border-top:1px solid var(--stroke);display:flex;flex-direction:column;gap:8px}
+.user-card{display:flex;align-items:center;gap:10px;padding:10px;background:var(--glass);border-radius:var(--r-sm)}
+.user-card .avatar{width:32px;height:32px;border-radius:8px;background:linear-gradient(145deg,var(--accent),var(--accent-deep));display:grid;place-items:center;color:#fff;font-size:13px;font-weight:700;flex:none}
+.user-card .info{flex:1;min-width:0}
+.user-card .info b{display:block;font-size:12px;font-weight:600;overflow:hidden;text-overflow:ellipsis}
+.user-card .info span{display:block;font-size:10px;color:var(--ink-3)}
 
-    input[type="email"],
-    input[type="password"],
-    input[type="text"],
-    input[type="date"] {
-      width: 100%;
-      padding: 12px 16px;
-      background: rgba(255, 255, 255, 0.15);
-      backdrop-filter: blur(10px);
-      border: 1px solid rgba(255, 255, 255, 0.2);
-      border-radius: 12px;
-      font-size: 14px;
-      color: rgba(255, 255, 255, 0.9);
-      transition: all 0.3s ease;
-    }
+/* MAIN */
+main{display:flex;flex-direction:column;gap:18px;overflow:auto;padding-right:8px}
 
-    input::placeholder {
-      color: rgba(255, 255, 255, 0.5);
-    }
+.head{display:flex;align-items:center;gap:16px;margin-bottom:8px;flex-wrap:wrap}
+.head h1{font-size:26px;font-weight:740;letter-spacing:-.5px}
+.head p{font-size:13px;color:var(--ink-3)}
+.head .spacer{flex:1}
 
-    input:focus {
-      outline: none;
-      background: rgba(255, 255, 255, 0.25);
-      border: 1px solid rgba(255, 255, 255, 0.4);
-      box-shadow: 0 0 20px rgba(255, 255, 255, 0.1);
-    }
+.grid{display:grid;gap:16px}
+.g-4{grid-template-columns:repeat(auto-fit,minmax(180px,1fr))}
+.g-2{grid-template-columns:repeat(auto-fit,minmax(280px,1fr))}
 
-    button {
-      background: linear-gradient(135deg, rgba(255, 255, 255, 0.25), rgba(255, 255, 255, 0.1));
-      backdrop-filter: blur(10px);
-      border: 1px solid rgba(255, 255, 255, 0.25);
-      color: white;
-      padding: 12px 24px;
-      border-radius: 12px;
-      cursor: pointer;
-      font-weight: 600;
-      width: 100%;
-      margin-top: 15px;
-      font-size: 14px;
-      transition: all 0.3s ease;
-    }
+.kpi{padding:20px;display:flex;flex-direction:column;gap:10px}
+.kpi .lab{font-size:12px;color:var(--ink-3);font-weight:560;display:flex;align-items:center;gap:6px}
+.kpi .val{font-size:32px;font-weight:700;letter-spacing:-1px;line-height:1}
+.kpi .sub{font-size:11px;color:var(--ink-3)}
 
-    button:hover {
-      background: linear-gradient(135deg, rgba(255, 255, 255, 0.35), rgba(255, 255, 255, 0.15));
-      border: 1px solid rgba(255, 255, 255, 0.35);
-      transform: translateY(-2px);
-    }
+.card{padding:20px;display:flex;flex-direction:column;gap:14px}
+.card-h{display:flex;align-items:center;gap:12px}
+.card-h h3{font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--ink-2)}
+.card-h .sub{font-size:12px;color:var(--ink-3);text-transform:none;letter-spacing:0;font-weight:500}
+.card-h .spacer{flex:1}
 
-    .tabs {
-      display: flex;
-      gap: 10px;
-      margin-bottom: 30px;
-      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-      padding-bottom: 15px;
-    }
+.tbl{width:100%;border-collapse:collapse;font-size:13px}
+.tbl thead{position:sticky;top:0;z-index:2}
+.tbl th{text-align:left;font-size:11px;font-weight:620;text-transform:uppercase;letter-spacing:.4px;color:var(--ink-2);padding:10px;background:rgba(0,0,0,.2);border-bottom:1px solid var(--stroke)}
+.tbl td{padding:11px 10px;border-top:1px solid var(--stroke);vertical-align:middle}
+.tbl tbody tr{transition:.16s}
+.tbl tbody tr:hover{background:var(--glass-2)}
+.tbl .nm{font-weight:580;color:var(--ink)}
+.tbl .mut{color:var(--ink-3);font-size:11.5px}
+.tbl .num{text-align:right;font-variant-numeric:tabular-nums}
+.tbl .acts{display:flex;gap:4px;justify-content:flex-end;opacity:.4;transition:.16s}
+.tbl tbody tr:hover .acts{opacity:1}
 
-    .tab-button {
-      background: transparent;
-      border: none;
-      color: rgba(255, 255, 255, 0.6);
-      padding: 12px 20px;
-      cursor: pointer;
-      font-weight: 500;
-      font-size: 14px;
-      border-bottom: 2px solid transparent;
-      transition: all 0.3s ease;
-      margin-top: 0 !important;
-    }
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:9px 15px;border-radius:var(--r-sm);border:1px solid var(--stroke);background:var(--glass-2);color:var(--ink);font:inherit;font-weight:580;cursor:pointer;transition:.18s}
+.btn:hover{background:var(--glass-hi);transform:translateY(-1px);box-shadow:0 4px 16px rgba(0,0,0,.32)}
+.btn:active{transform:scale(.96)}
+.btn.pri{background:linear-gradient(145deg,var(--accent),var(--accent-soft));border-color:transparent;color:#fff;box-shadow:var(--glow)}
+.btn.pri:hover{box-shadow:0 8px 24px rgba(124,92,255,.42)}
+.btn.sm{padding:6px 11px;border-radius:var(--r-xs);font-size:12px}
+.btn.ico{width:32px;height:32px;padding:0}
+.btn.dgr{color:var(--danger)}
 
-    .tab-button:hover {
-      color: rgba(255, 255, 255, 0.8);
-    }
+.pill{display:inline-flex;align-items:center;gap:5px;padding:4px 10px;border-radius:var(--r-full);font-size:11px;font-weight:600;white-space:nowrap;background:rgba(50,215,75,.15);color:var(--success);border:1px solid rgba(50,215,75,.25)}
+.pill.o{background:rgba(255,212,38,.15);color:var(--warning);border-color:rgba(255,212,38,.25)}
+.pill.r{background:rgba(255,69,58,.15);color:var(--danger);border-color:rgba(255,69,58,.25)}
 
-    .tab-button.active {
-      color: white;
-      border-bottom-color: rgba(255, 255, 255, 0.5);
-    }
+/* MODALES */
+.modal{position:fixed;inset:0;z-index:200;background:rgba(0,0,0,.6);backdrop-filter:blur(8px);display:none;align-items:center;justify-content:center;padding:20px;animation:fadeIn .2s var(--spring)}
+.modal.on{display:flex}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+.modal-box{background:var(--glass);border-radius:var(--r-lg);width:100%;max-width:520px;max-height:90vh;overflow:auto;padding:28px;animation:pop .3s var(--spring)}
+@keyframes pop{from{opacity:0;transform:translateY(20px) scale(.94)}to{opacity:1;transform:none}}
+.modal-box h2{font-size:20px;font-weight:700;margin-bottom:12px}
+.modal-box p{font-size:13px;color:var(--ink-3);margin-bottom:20px}
 
-    .tab-content {
-      display: none;
-    }
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:18px}
+.field{display:flex;flex-direction:column;gap:6px}
+.field.full{grid-column:1/-1}
+.field label{font-size:12px;font-weight:600;color:var(--ink-2);text-transform:uppercase;letter-spacing:.3px}
+.field input,.field textarea{background:var(--glass);border:1px solid var(--stroke);border-radius:var(--r-sm);color:var(--ink);font:inherit;padding:10px;transition:.18s;outline:none}
+.field input:focus,.field textarea:focus{border-color:var(--accent);box-shadow:0 0 0 2px rgba(124,92,255,.25)}
 
-    .tab-content.active {
-      display: block;
-    }
+.form-foot{display:flex;gap:10px;justify-content:flex-end;padding-top:16px;border-top:1px solid var(--stroke);margin-top:18px;flex-wrap:wrap}
 
-    .form-card {
-      background: rgba(255, 255, 255, 0.08);
-      backdrop-filter: blur(10px);
-      border: 1px solid rgba(255, 255, 255, 0.18);
-      padding: 30px;
-      border-radius: 20px;
-      margin-bottom: 30px;
-    }
+.toast{position:fixed;bottom:24px;right:24px;padding:14px 18px;background:var(--glass);border:1px solid var(--stroke);border-radius:var(--r-md);display:flex;align-items:center;gap:10px;color:var(--ink);font-size:13px;font-weight:550;animation:slideUp .3s var(--spring);z-index:300}
+@keyframes slideUp{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:none}}
+.toast.ok{border-color:rgba(50,215,75,.3);color:var(--success)}
+.toast.er{border-color:rgba(255,69,58,.3);color:var(--danger)}
+.toast svg{width:18px;height:18px;flex:none}
 
-    .hidden {
-      display: none !important;
-    }
+#boot{position:fixed;inset:0;z-index:1000;background:var(--navy-900);display:flex;align-items:center;justify-content:center;padding:20px}
+</style>
 
-    .error {
-      background: rgba(220, 38, 38, 0.3);
-      color: rgba(255, 100, 100, 1);
-      padding: 12px 16px;
-      border-radius: 10px;
-      border: 1px solid rgba(220, 38, 38, 0.5);
-      margin-bottom: 15px;
-      font-size: 13px;
-    }
-
-    .success {
-      background: rgba(34, 197, 94, 0.3);
-      color: rgba(100, 255, 100, 1);
-      padding: 12px 16px;
-      border-radius: 10px;
-      border: 1px solid rgba(34, 197, 94, 0.5);
-      margin-bottom: 15px;
-      font-size: 13px;
-    }
-
-    .logout-btn {
-      background: rgba(255, 255, 255, 0.1) !important;
-      border: 1px solid rgba(255, 255, 255, 0.2) !important;
-      padding: 8px 16px !important;
-      font-size: 13px !important;
-      width: auto !important;
-      margin-top: 0 !important;
-    }
-
-    .header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 30px;
-    }
-
-    .subscriber-list {
-      background: rgba(255, 255, 255, 0.08);
-      backdrop-filter: blur(10px);
-      border: 1px solid rgba(255, 255, 255, 0.18);
-      border-radius: 15px;
-      padding: 20px;
-    }
-
-    .subscriber-item {
-      background: rgba(255, 255, 255, 0.08);
-      border: 1px solid rgba(255, 255, 255, 0.1);
-      padding: 15px;
-      border-radius: 12px;
-      margin-bottom: 10px;
-    }
-
-    .subscriber-info {
-      color: rgba(255, 255, 255, 0.85);
-      font-size: 13px;
-    }
-
-    .status-badge {
-      display: inline-block;
-      padding: 4px 12px;
-      border-radius: 20px;
-      font-size: 11px;
-      font-weight: 600;
-      margin-top: 8px;
-    }
-
-    .status-pending {
-      background: rgba(251, 191, 36, 0.25);
-      border: 1px solid rgba(251, 191, 36, 0.5);
-      color: rgba(255, 210, 100, 1);
-    }
-
-    .status-sent {
-      background: rgba(34, 197, 94, 0.25);
-      border: 1px solid rgba(34, 197, 94, 0.5);
-      color: rgba(100, 255, 100, 1);
-    }
-
-    .loading {
-      text-align: center;
-      padding: 40px 20px;
-      color: rgba(255, 255, 255, 0.6);
-      font-size: 14px;
-    }
-
-    .btn-sent {
-      width: auto !important;
-      padding: 6px 14px !important;
-      font-size: 12px !important;
-      margin-top: 10px !important;
-    }
-
-    p {
-      color: rgba(255, 255, 255, 0.7);
-      font-size: 14px;
-      margin-bottom: 20px;
-      line-height: 1.6;
-    }
-
-    .shipment-item {
-      background: rgba(255, 255, 255, 0.08);
-      border: 1px solid rgba(255, 255, 255, 0.1);
-      padding: 15px;
-      border-radius: 12px;
-      margin-bottom: 10px;
-      display: flex;
-      justify-content: space-between;
-      align-items: flex-start;
-    }
-
-    @media (max-width: 768px) {
-      .container {
-        padding: 30px;
-      }
-
-      h1 {
-        font-size: 24px;
-      }
-
-      .header {
-        flex-direction: column;
-        gap: 15px;
-      }
-    }
-  </style>
-</head>
 <body>
+<div class="ambient">
+  <div class="orb a"></div>
+  <div class="orb b"></div>
+  <div class="orb c"></div>
+</div>
 
-<div class="container" id="app">
-  <!-- Login Screen -->
-  <div id="authScreen" class="auth-form">
-    <h1>🥋 Judo Kids Manager</h1>
-    <div id="authMessage"></div>
+<div id="boot"></div>
+<div id="root">
+  <aside id="sidebarAuth" class="hidden">
+    <div class="logo">
+      <div class="ico">🥋</div>
+      <div><h1>Judo Kids</h1><p>Manager</p></div>
+    </div>
+    <button class="btn pri" onclick="window.login()">Se connecter</button>
+  </aside>
+
+  <aside id="sidebar" class="hidden">
+    <div class="logo">
+      <div class="ico">🥋</div>
+      <div><h1>Judo Kids</h1><p>Manager</p></div>
+    </div>
     
-    <div class="form-group">
-      <label>Email</label>
-      <input type="email" id="email" placeholder="Identifiant">
-    </div>
-    <div class="form-group">
-      <label>Mot de passe</label>
-      <input type="password" id="password" placeholder="Mot de passe">
-    </div>
-    <button onclick="login()">Se connecter</button>
-  </div>
-
-  <!-- Dashboard Screen -->
-  <div id="dashScreen" class="hidden">
-    <div class="header">
-      <h1>🥋 Judo Kids Manager</h1>
-      <button class="logout-btn" onclick="logout()">Déconnexion</button>
+    <div>
+      <div class="nav-sec">Navigation</div>
+      <button class="nav-btn on" onclick="window.goView('dashboard')"><i>📊</i> Dashboard</button>
+      <button class="nav-btn" onclick="window.goView('abonnes')"><i>👥</i> Abonnés <span class="nav-cnt" id="cntAbo">0</span></button>
+      <button class="nav-btn" onclick="window.goView('envois')"><i>📦</i> Envois <span class="nav-cnt" id="cntEnv">0</span></button>
     </div>
 
-    <div class="tabs">
-      <button class="tab-button active" onclick="switchTab('abonnes', event)">👥 Abonnés</button>
-      <button class="tab-button" onclick="switchTab('envois', event)">📦 Envois</button>
-    </div>
-
-    <!-- Onglet Abonnés -->
-    <div id="abonnes" class="tab-content active">
-      <div class="form-card">
-        <h2>➕ Ajouter un abonné</h2>
-        <div id="addMessage"></div>
-        <div class="form-group">
-          <label>Prénom</label>
-          <input type="text" id="firstName" placeholder="Jean">
+    <div class="nav-foot">
+      <div class="user-card">
+        <div class="avatar" id="uAvatar">?</div>
+        <div class="info">
+          <b id="uEmail"></b>
+          <span>Admin</span>
         </div>
-        <div class="form-group">
-          <label>Nom</label>
-          <input type="text" id="lastName" placeholder="Dupont">
-        </div>
-        <div class="form-group">
-          <label>Email</label>
-          <input type="email" id="subscriberEmail" placeholder="jean@example.com">
-        </div>
-        <div class="form-group">
-          <label>Adresse</label>
-          <input type="text" id="address" placeholder="123 Rue de la Paix, 75000 Paris">
-        </div>
-        <div class="form-group">
-          <label>Date de début d'abonnement</label>
-          <input type="date" id="startDate">
-        </div>
-        <button onclick="addSubscriber()">✓ Ajouter l'abonné</button>
       </div>
-
-      <h2>📋 Liste des abonnés</h2>
-      <div id="subscribersList" class="subscriber-list loading">
-        Chargement...
-      </div>
+      <button class="nav-btn" onclick="window.logout()"><i>🚪</i> Déconnexion</button>
     </div>
+  </aside>
 
-    <!-- Onglet Envois -->
-    <div id="envois" class="tab-content">
-      <h2>📦 Calendrier d'envois</h2>
-      <p>Les envois sont générés automatiquement au moment de créer un abonné. Cliquez sur "Marqué envoyé" pour mettre à jour le statut.</p>
-      
-      <div id="shipmentsList" class="loading">
-        Chargement...
-      </div>
-    </div>
+  <main id="app" class="hidden">
+    <div id="content"></div>
+  </main>
+</div>
+
+<div id="authScreen" style="display:grid;place-items:center;min-height:100vh;padding:20px">
+  <div class="glass" style="width:100%;max-width:420px;padding:32px;border-radius:var(--r-lg)">
+    <div style="width:48px;height:48px;border-radius:var(--r-sm);background:linear-gradient(145deg,var(--accent),var(--accent-soft));display:grid;place-items:center;color:#fff;font-size:24px;font-weight:700;margin-bottom:20px">🥋</div>
+    <h1 style="font-size:22px;font-weight:700;margin-bottom:8px">Judo Kids Manager</h1>
+    <p style="font-size:13px;color:var(--ink-3);margin-bottom:20px">Gestion des envois L'Esprit du Judo Kids</p>
+    <div id="authErr" style="padding:10px;background:rgba(255,69,58,.15);border:1px solid rgba(255,69,58,.3);border-radius:var(--r-xs);color:var(--danger);font-size:12px;margin-bottom:14px;display:none"></div>
+    <div class="field full"><input type="email" id="email" placeholder="Email" value="paul@sen-no-sen.com"></div>
+    <div class="field full"><input type="password" id="pass" placeholder="Mot de passe"></div>
+    <button class="btn pri" style="width:100%;margin-top:14px" onclick="window.login()">Connexion</button>
   </div>
 </div>
 
+<div id="toasts" style="position:fixed;bottom:20px;right:20px;z-index:300;display:flex;flex-direction:column;gap:10px"></div>
+
+<div id="modal" class="modal">
+  <div class="modal-box" id="modalContent"></div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
-  // ============================================
-  // Supabase Config
-  // ============================================
-  const SUPABASE_URL = 'https://wojlwjplzlxkvqxmehdu.supabase.co';
-  const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Indvamx3anBsemx4a3ZxeG1laGR1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTAwNjUwOTcsImV4cCI6MjEwNTY0MTA5N30.Ik7iEpdpSzCyGgMuPpy0oIokaWIWE9E7aE5t-9ePiMA';
+const SUPABASE_URL = 'https://wojlwjplzlxkvqxmehdu.supabase.co';
+const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Indvamx3anBsemx4a3ZxeG1laGR1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTAwNjUwOTcsImV4cCI6MjEwNTY0MTA5N30.Ik7iEpdpSzCyGgMuPpy0oIokaWIWE9E7aE5t-9ePiMA';
+
+const MAGAZINES = [
+  {num:4, title:'Sept 2026', date:'2026-09-15'},
+  {num:5, title:'Nov 2026', date:'2026-11-15'},
+  {num:6, title:'Jan 2027', date:'2027-01-15'},
+  {num:7, title:'Mar 2027', date:'2027-03-15'},
+  {num:8, title:'May 2027', date:'2027-05-15'},
+  {num:9, title:'Jul 2027', date:'2027-07-15'},
+  {num:10, title:'Sep 2027', date:'2027-09-15'},
+  {num:11, title:'Nov 2027', date:'2027-11-15'},
+  {num:12, title:'Jan 2028', date:'2028-01-15'}
+];
+
+const $ = s => document.querySelector(s);
+const $$ = s => [...document.querySelectorAll(s)];
+const esc = s => String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const dfr = d => d ? new Date(d+'T12:00').toLocaleDateString('fr-FR',{day:'2-digit',month:'short',year:'numeric'}) : '—';
+const initials = s => String(s||'').trim().split(/\s+/).map(w=>w[0]).join('').toUpperCase();
+
+let sb = null, S = {user:null, subscribers:[], shipments:[], view:'dashboard'};
+
+async function init(){
+  sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+  const {data:{user}} = await sb.auth.getUser();
   
-  let supabase = null;
-  let currentUser = null;
-  let currentOrg = null;
-
-  // Initialiser Supabase
-  if (typeof window.supabase !== 'undefined') {
-    supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+  if(!user) {
+    $('#authScreen').style.display = 'grid';
+    $('#root').style.display = 'none';
+    return;
   }
+  
+  S.user = user;
+  await loadData();
+  showApp();
+}
 
-  // ============================================
-  // AUTH - Seul login (pas d'inscription)
-  // ============================================
+async function loadData(){
+  const [s1, s2] = await Promise.all([
+    sb.from('subscribers').select('*'),
+    sb.from('shipments').select('*')
+  ]);
+  S.subscribers = s1.data || [];
+  S.shipments = s2.data || [];
+  updateBadges();
+}
 
-  async function login() {
-    const email = document.getElementById('email').value;
-    const password = document.getElementById('password').value;
+function updateBadges(){
+  const pending = S.shipments.filter(s=>!s.sent_at).length;
+  $('#cntAbo').textContent = S.subscribers.length;
+  $('#cntEnv').textContent = pending;
+}
 
-    if (!email || !password) {
-      showMessage('authMessage', 'Remplis email et mot de passe', 'error');
-      return;
-    }
+function showApp(){
+  $('#authScreen').style.display = 'none';
+  $('#root').style.display = 'grid';
+  $('#app').classList.remove('hidden');
+  $('#sidebar').classList.remove('hidden');
+  $('#uEmail').textContent = S.user.email;
+  $('#uAvatar').textContent = initials(S.user.email);
+  renderDashboard();
+}
 
-    try {
-      const { data, error } = await supabase.auth.signInWithPassword({ email, password });
-      if (error) {
-        showMessage('authMessage', error.message, 'error');
-        return;
-      }
+window.goView = async (v) => {
+  S.view = v;
+  $$('.nav-btn').forEach(b => b.classList.remove('on'));
+  event.target.closest('.nav-btn').classList.add('on');
+  
+  if(v === 'dashboard') renderDashboard();
+  else if(v === 'abonnes') renderAbonnes();
+  else if(v === 'envois') renderEnvois();
+};
 
-      currentUser = data.user;
-      await loadUserOrg();
-      showDashboard();
-    } catch (e) {
-      showMessage('authMessage', e.message, 'error');
-    }
-  }
-
-  async function logout() {
-    await supabase.auth.signOut();
-    currentUser = null;
-    currentOrg = null;
-    document.getElementById('authScreen').classList.remove('hidden');
-    document.getElementById('dashScreen').classList.add('hidden');
-    document.getElementById('email').value = '';
-    document.getElementById('password').value = '';
-  }
-
-  async function loadUserOrg() {
-    const { data, error } = await supabase
-      .from('profiles')
-      .select('organization_id')
-      .eq('id', currentUser.id)
-      .single();
-
-    if (error) {
-      showMessage('authMessage', 'Erreur: ' + error.message, 'error');
-      return;
-    }
-
-    currentOrg = data.organization_id;
-  }
-
-  // ============================================
-  // SUBSCRIBERS
-  // ============================================
-
-  async function addSubscriber() {
-    const firstName = document.getElementById('firstName').value;
-    const lastName = document.getElementById('lastName').value;
-    const email = document.getElementById('subscriberEmail').value;
-    const address = document.getElementById('address').value;
-    const startDate = document.getElementById('startDate').value;
-
-    if (!firstName || !lastName || !email || !startDate) {
-      showMessage('addMessage', 'Remplis tous les champs requis', 'error');
-      return;
-    }
-
-    const { data: subData, error: subError } = await supabase
-      .from('subscribers')
-      .insert([{
-        organization_id: currentOrg,
-        first_name: firstName,
-        last_name: lastName,
-        email: email,
-        address: address,
-        subscription_start_date: startDate
-      }])
-      .select();
-
-    if (subError) {
-      showMessage('addMessage', subError.message, 'error');
-      return;
-    }
-
-    const subscriberId = subData[0].id;
-    const shipments = generateShipments(subscriberId, startDate);
-    const { error: shipError } = await supabase
-      .from('shipments')
-      .insert(shipments);
-
-    if (shipError) {
-      showMessage('addMessage', shipError.message, 'error');
-      return;
-    }
-
-    showMessage('addMessage', '✓ Abonné ajouté avec 12 envois générés!', 'success');
-    clearForm();
-    loadSubscribers();
-    loadShipments();
-  }
-
-  function generateShipments(subscriberId, startDate) {
-    const start = new Date(startDate);
-    const shipments = [];
-
-    for (let i = 1; i <= 12; i++) {
-      const shipDate = new Date(start);
-      shipDate.setMonth(shipDate.getMonth() + Math.floor((i - 1) / 2));
-
-      shipments.push({
-        subscriber_id: subscriberId,
-        shipment_number: i,
-        scheduled_date: shipDate.toISOString().split('T')[0],
-        magazine_number: ((i - 1) % 6) + 1,
-        poster_number: ((i - 1) % 6) + 1,
-        sticker_pair: i,
-        status: 'pending'
-      });
-    }
-
-    return shipments;
-  }
-
-  async function loadSubscribers() {
-    if (!currentOrg) return;
-
-    const { data, error } = await supabase
-      .from('subscribers')
-      .select('*')
-      .eq('organization_id', currentOrg)
-      .order('created_at', { ascending: false });
-
-    if (error) {
-      document.getElementById('subscribersList').innerHTML = `<div class="error">Erreur: ${error.message}</div>`;
-      return;
-    }
-
-    if (data.length === 0) {
-      document.getElementById('subscribersList').innerHTML = '<div class="loading">Aucun abonné pour le moment.</div>';
-      return;
-    }
-
-    document.getElementById('subscribersList').innerHTML = data.map(sub => `
-      <div class="subscriber-item">
-        <div class="subscriber-info">
-          <strong>${sub.first_name} ${sub.last_name}</strong><br>
-          ${sub.email}<br>
-          <small style="opacity: 0.7;">Depuis: ${formatDate(sub.subscription_start_date)}</small>
-        </div>
+function renderDashboard(){
+  const pending = S.shipments.filter(s=>!s.sent_at).length;
+  const sent = S.shipments.filter(s=>s.sent_at).length;
+  const nextMag = MAGAZINES[0];
+  const related = S.shipments.filter(s=>s.magazine_number===nextMag.num && !s.sent_at);
+  const prog = S.subscribers.length ? Math.round((S.subscribers.length-related.length)/S.subscribers.length*100) : 0;
+  
+  $('#content').innerHTML = `
+    <div class="head"><div><h1>📊 Dashboard</h1><p>Vue d'ensemble de vos envois</p></div></div>
+    
+    <div class="grid g-4">
+      <div class="glass kpi">
+        <div class="lab"><span>👥</span> Abonnés</div>
+        <div class="val">${S.subscribers.length}</div>
+        <div class="sub">Actuellement actifs</div>
       </div>
-    `).join('');
-  }
-
-  async function loadShipments() {
-    if (!currentOrg) return;
-
-    const { data, error } = await supabase
-      .from('shipments')
-      .select(`
-        *,
-        subscribers(first_name, last_name, email)
-      `)
-      .eq('subscribers.organization_id', currentOrg)
-      .order('scheduled_date', { ascending: true });
-
-    if (error) {
-      document.getElementById('shipmentsList').innerHTML = `<div class="error">Erreur: ${error.message}</div>`;
-      return;
-    }
-
-    if (data.length === 0) {
-      document.getElementById('shipmentsList').innerHTML = '<div class="loading">Aucun envoi pour le moment.</div>';
-      return;
-    }
-
-    document.getElementById('shipmentsList').innerHTML = data.map(ship => `
-      <div class="shipment-item">
-        <div class="subscriber-info">
-          <strong>${ship.subscribers.first_name} ${ship.subscribers.last_name}</strong><br>
-          📅 ${formatDate(ship.scheduled_date)} | 
-          📖 Mag #${ship.magazine_number} | 
-          🎨 Poster #${ship.poster_number} | 
-          ✨ Stickers #${ship.sticker_pair}
-          <br>
-          <span class="status-badge status-${ship.status}">
-            ${ship.status === 'pending' ? '⏳ En attente' : '✅ Envoyé'}
-          </span>
-        </div>
-        ${ship.status === 'pending' ? `<button class="btn-sent" onclick="markAsSent('${ship.id}')">Marqué envoyé</button>` : ''}
+      <div class="glass kpi">
+        <div class="lab"><span>📦</span> En attente</div>
+        <div class="val">${pending}</div>
+        <div class="sub">À envoyer</div>
       </div>
-    `).join('');
+      <div class="glass kpi">
+        <div class="lab"><span>✅</span> Envoyés</div>
+        <div class="val">${sent}</div>
+        <div class="sub">Tous les temps</div>
+      </div>
+      <div class="glass kpi">
+        <div class="lab"><span>🎯</span> Progression</div>
+        <div class="val">${prog}%</div>
+        <div class="sub">${nextMag.title}</div>
+      </div>
+    </div>
+    
+    <div class="glass card">
+      <div class="card-h"><h3>📚 ${nextMag.title}</h3><div class="spacer"></div><span class="pill">${prog}%</span></div>
+      <div style="display:flex;gap:12px;flex-direction:column">
+        <div style="height:10px;background:rgba(255,255,255,.1);border-radius:6px;overflow:hidden">
+          <div style="width:${prog}%;height:100%;background:linear-gradient(90deg,var(--accent),var(--accent-soft));transition:width .4s var(--spring)"></div>
+        </div>
+        <div style="font-size:12px;color:var(--ink-3)"><b>${S.subscribers.length-related.length}/${S.subscribers.length}</b> abonnés livrés</div>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(100px,1fr));gap:10px;margin-top:12px">
+        ${MAGAZINES.slice(0,4).map(m=>`<div style="padding:10px;background:rgba(255,255,255,.05);border-radius:10px;font-size:11px;text-align:center"><b>#${m.num}</b><br><span style="color:var(--ink-3)">${dfr(m.date)}</span></div>`).join('')}
+      </div>
+    </div>`;
+}
+
+function renderAbonnes(){
+  $('#content').innerHTML = `
+    <div class="head"><div><h1>👥 Abonnés</h1><p>${S.subscribers.length} abonnés enregistrés</p></div></div>
+    <div class="glass card">
+      <table class="tbl">
+        <thead><tr><th>Nom</th><th>Email</th><th>Adresse</th><th style="text-align:right">Actions</th></tr></thead>
+        <tbody>
+          ${S.subscribers.map(s=>`<tr>
+            <td class="nm">${esc(s.first_name)} ${esc(s.last_name)}</td>
+            <td class="mut">${esc(s.email)}</td>
+            <td class="mut">${esc(s.address.slice(0,35))}</td>
+            <td style="text-align:right"><div class="acts"><button class="btn sm ico" onclick="window.editSub(${s.id})" title="Modifier">✏️</button></div></td>
+          </tr>`).join('')}
+        </tbody>
+      </table>
+    </div>`;
+}
+
+window.editSub = (id) => {
+  const s = S.subscribers.find(x=>x.id===id);
+  $('#modalContent').innerHTML = `
+    <h2>${s.first_name} ${s.last_name}</h2>
+    <p>Modifiez les informations de cet abonné</p>
+    <div class="form-grid">
+      <div class="field"><label>Prénom</label><input type="text" id="fname" value="${esc(s.first_name)}"></div>
+      <div class="field"><label>Nom</label><input type="text" id="lname" value="${esc(s.last_name)}"></div>
+      <div class="field full"><label>Email</label><input type="email" id="email" value="${esc(s.email)}"></div>
+      <div class="field full"><label>Adresse</label><textarea id="addr" style="min-height:90px">${esc(s.address)}</textarea></div>
+    </div>
+    <div class="form-foot">
+      <button class="btn" onclick="window.closeModal()">Annuler</button>
+      <button class="btn pri" onclick="window.saveSub(${id})">Enregistrer</button>
+    </div>`;
+  $('#modal').classList.add('on');
+};
+
+window.saveSub = async (id) => {
+  const data = {first_name:$('#fname').value, last_name:$('#lname').value, email:$('#email').value, address:$('#addr').value};
+  await sb.from('subscribers').update(data).eq('id',id);
+  await loadData();
+  window.closeModal();
+  renderAbonnes();
+  toast('Abonné modifié', 'ok');
+};
+
+function renderEnvois(){
+  const byMonth = {};
+  S.shipments.forEach(s=>{
+    const key = s.scheduled_date?.slice(0,7) || '2026-09';
+    if(!byMonth[key]) byMonth[key] = [];
+    byMonth[key].push(s);
+  });
+  
+  let html = `<div class="head"><div><h1>📦 Envois</h1><p>Historique par mois</p></div></div>`;
+  Object.keys(byMonth).sort().forEach(month=>{
+    const m = new Date(month+'-01');
+    html += `<div class="glass card" style="margin-bottom:16px">
+      <div class="card-h"><h3>${m.toLocaleDateString('fr-FR',{month:'long',year:'numeric'})}</h3></div>
+      <table class="tbl">
+        <thead><tr><th>Abonné</th><th>Mag</th><th>Poster</th><th>Stickers</th><th>Statut</th><th style="text-align:right">Action</th></tr></thead>
+        <tbody>
+          ${byMonth[month].map(ship=>{
+            const sub = S.subscribers.find(x=>x.id===ship.subscriber_id);
+            return `<tr>
+              <td class="nm">${esc(sub?.first_name||'')} ${esc(sub?.last_name||'')}</td>
+              <td>#${ship.magazine_number}</td>
+              <td>#${ship.poster_number}</td>
+              <td>${ship.sticker_pair*2-1}-${ship.sticker_pair*2}</td>
+              <td><span class="pill ${ship.sent_at?'':'o'}">${ship.sent_at?'✅ Envoyé':'⏳ Attente'}</span></td>
+              <td style="text-align:right"><div class="acts">${!ship.sent_at?`<button class="btn sm ico" onclick="window.markSent(${ship.id})">✓</button>`:''}</div></td>
+            </tr>`;
+          }).join('')}
+        </tbody>
+      </table>
+    </div>`;
+  });
+  
+  $('#content').innerHTML = html;
+}
+
+window.markSent = async (id) => {
+  await sb.from('shipments').update({sent_at:new Date().toISOString()}).eq('id',id);
+  await loadData();
+  renderEnvois();
+  toast('Envoi marqué comme envoyé', 'ok');
+};
+
+window.login = async () => {
+  const email = $('#email').value.trim();
+  const pass = $('#pass').value;
+  
+  if(!email || !pass) {
+    $('#authErr').textContent = 'Email et mot de passe requis';
+    $('#authErr').style.display = 'block';
+    return;
   }
-
-  async function markAsSent(shipmentId) {
-    const { error } = await supabase
-      .from('shipments')
-      .update({ status: 'sent', sent_at: new Date().toISOString() })
-      .eq('id', shipmentId);
-
-    if (error) {
-      alert('Erreur: ' + error.message);
-      return;
-    }
-
-    loadShipments();
+  
+  const {error} = await sb.auth.signInWithPassword({email,password:pass});
+  if(error) {
+    $('#authErr').textContent = error.message;
+    $('#authErr').style.display = 'block';
+  } else {
+    location.reload();
   }
+};
 
-  // ============================================
-  // UI
-  // ============================================
+window.logout = async () => {
+  await sb.auth.signOut();
+  location.reload();
+};
 
-  function showDashboard() {
-    document.getElementById('authScreen').classList.add('hidden');
-    document.getElementById('dashScreen').classList.remove('hidden');
-    loadSubscribers();
-    loadShipments();
-  }
+window.closeModal = () => $('#modal').classList.remove('on');
+$('#modal').addEventListener('click', e => {
+  if(e.target === $('#modal')) window.closeModal();
+});
 
-  function switchTab(tab, event) {
-    document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
-    document.querySelectorAll('.tab-button').forEach(el => el.classList.remove('active'));
-    document.getElementById(tab).classList.add('active');
-    event.target.classList.add('active');
-  }
+function toast(msg, kind='ok'){
+  const ico = {ok:'✓',er:'⚠',in:'ℹ'}[kind]||'ℹ';
+  const el = document.createElement('div');
+  el.className = `toast ${kind}`;
+  el.textContent = msg;
+  $('#toasts').appendChild(el);
+  setTimeout(()=>el.remove(),3000);
+}
 
-  function showMessage(elementId, message, type) {
-    const el = document.getElementById(elementId);
-    el.innerHTML = `<div class="${type}">${message}</div>`;
-  }
-
-  function clearForm() {
-    document.getElementById('firstName').value = '';
-    document.getElementById('lastName').value = '';
-    document.getElementById('subscriberEmail').value = '';
-    document.getElementById('address').value = '';
-    document.getElementById('startDate').value = '';
-  }
-
-  function formatDate(dateStr) {
-    return new Date(dateStr).toLocaleDateString('fr-FR', { 
-      year: 'numeric', 
-      month: 'long', 
-      day: 'numeric' 
-    });
-  }
-
-  // ============================================
-  // INIT - Check session
-  // ============================================
-
-  async function init() {
-    if (!supabase) return;
-    const { data: { user } } = await supabase.auth.getUser();
-    if (user) {
-      currentUser = user;
-      await loadUserOrg();
-      showDashboard();
-    }
-  }
-
-  init();
+init();
 </script>
-
 </body>
 </html>
