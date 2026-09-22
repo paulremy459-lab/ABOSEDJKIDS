@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>🥋 Judo Kids Manager</title>
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.0.0/dist/umd/supabase.min.js"></script>
   <style>
     * {
       margin: 0;
@@ -20,7 +20,6 @@
       align-items: center;
       justify-content: center;
       padding: 20px;
-      backdrop-filter: blur(50px);
     }
 
     .container {
@@ -40,7 +39,6 @@
       text-align: center;
       font-size: 36px;
       font-weight: 700;
-      text-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
     }
 
     h2 {
@@ -48,7 +46,6 @@
       margin-top: 30px;
       margin-bottom: 20px;
       font-size: 20px;
-      font-weight: 600;
     }
 
     .auth-form {
@@ -59,7 +56,6 @@
       border-radius: 20px;
       max-width: 420px;
       margin: 0 auto;
-      box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.25);
     }
 
     .form-group {
@@ -72,14 +68,12 @@
       font-weight: 600;
       color: rgba(255, 255, 255, 0.9);
       font-size: 13px;
-      letter-spacing: 0.5px;
     }
 
     input[type="email"],
     input[type="password"],
     input[type="text"],
-    input[type="date"],
-    select {
+    input[type="date"] {
       width: 100%;
       padding: 12px 16px;
       background: rgba(255, 255, 255, 0.15);
@@ -91,18 +85,11 @@
       transition: all 0.3s ease;
     }
 
-    input[type="email"]::placeholder,
-    input[type="password"]::placeholder,
-    input[type="text"]::placeholder,
-    input[type="date"]::placeholder {
+    input::placeholder {
       color: rgba(255, 255, 255, 0.5);
     }
 
-    input[type="email"]:focus,
-    input[type="password"]:focus,
-    input[type="text"]:focus,
-    input[type="date"]:focus,
-    select:focus {
+    input:focus {
       outline: none;
       background: rgba(255, 255, 255, 0.25);
       border: 1px solid rgba(255, 255, 255, 0.4);
@@ -122,33 +109,12 @@
       margin-top: 15px;
       font-size: 14px;
       transition: all 0.3s ease;
-      text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
-      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
     }
 
     button:hover {
       background: linear-gradient(135deg, rgba(255, 255, 255, 0.35), rgba(255, 255, 255, 0.15));
       border: 1px solid rgba(255, 255, 255, 0.35);
-      box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
       transform: translateY(-2px);
-    }
-
-    button:active {
-      transform: translateY(0);
-    }
-
-    .btn-primary {
-      background: linear-gradient(135deg, #667eea, #764ba2);
-      border: none;
-    }
-
-    .btn-primary:hover {
-      background: linear-gradient(135deg, #7b8fea, #8a5ab0);
-    }
-
-    .btn-secondary {
-      background: rgba(255, 255, 255, 0.1);
-      border: 1px solid rgba(255, 255, 255, 0.2);
     }
 
     .tabs {
@@ -170,34 +136,23 @@
       border-bottom: 2px solid transparent;
       transition: all 0.3s ease;
       margin-top: 0 !important;
-      box-shadow: none;
     }
 
     .tab-button:hover {
-      background: transparent;
       color: rgba(255, 255, 255, 0.8);
-      box-shadow: none;
-      transform: none;
     }
 
     .tab-button.active {
       color: white;
       border-bottom-color: rgba(255, 255, 255, 0.5);
-      box-shadow: none;
     }
 
     .tab-content {
       display: none;
-      animation: fadeIn 0.3s ease;
     }
 
     .tab-content.active {
       display: block;
-    }
-
-    @keyframes fadeIn {
-      from { opacity: 0; }
-      to { opacity: 1; }
     }
 
     .form-card {
@@ -221,7 +176,6 @@
       border: 1px solid rgba(220, 38, 38, 0.5);
       margin-bottom: 15px;
       font-size: 13px;
-      backdrop-filter: blur(10px);
     }
 
     .success {
@@ -232,7 +186,6 @@
       border: 1px solid rgba(34, 197, 94, 0.5);
       margin-bottom: 15px;
       font-size: 13px;
-      backdrop-filter: blur(10px);
     }
 
     .logout-btn {
@@ -251,8 +204,7 @@
       margin-bottom: 30px;
     }
 
-    .subscriber-list,
-    .shipments-grid {
+    .subscriber-list {
       background: rgba(255, 255, 255, 0.08);
       backdrop-filter: blur(10px);
       border: 1px solid rgba(255, 255, 255, 0.18);
@@ -260,20 +212,15 @@
       padding: 20px;
     }
 
-    .subscriber-item,
-    .shipment-item {
+    .subscriber-item {
       background: rgba(255, 255, 255, 0.08);
       border: 1px solid rgba(255, 255, 255, 0.1);
       padding: 15px;
       border-radius: 12px;
       margin-bottom: 10px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
     }
 
-    .subscriber-info,
-    .shipment-info {
+    .subscriber-info {
       color: rgba(255, 255, 255, 0.85);
       font-size: 13px;
     }
@@ -284,7 +231,7 @@
       border-radius: 20px;
       font-size: 11px;
       font-weight: 600;
-      backdrop-filter: blur(10px);
+      margin-top: 8px;
     }
 
     .status-pending {
@@ -310,7 +257,7 @@
       width: auto !important;
       padding: 6px 14px !important;
       font-size: 12px !important;
-      margin-top: 0 !important;
+      margin-top: 10px !important;
     }
 
     p {
@@ -320,10 +267,15 @@
       line-height: 1.6;
     }
 
-    .signup-toggle-form {
-      margin-top: 20px;
-      padding-top: 20px;
-      border-top: 1px solid rgba(255, 255, 255, 0.1);
+    .shipment-item {
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      padding: 15px;
+      border-radius: 12px;
+      margin-bottom: 10px;
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
     }
 
     @media (max-width: 768px) {
@@ -335,19 +287,9 @@
         font-size: 24px;
       }
 
-      .auth-form {
-        padding: 30px;
-        max-width: 100%;
-      }
-
       .header {
         flex-direction: column;
         gap: 15px;
-        align-items: flex-start;
-      }
-
-      .tabs {
-        flex-wrap: wrap;
       }
     }
   </style>
@@ -362,22 +304,13 @@
     
     <div class="form-group">
       <label>Email</label>
-      <input type="email" id="email" placeholder="tonmail@example.com">
+      <input type="email" id="email" placeholder="Identifiant">
     </div>
     <div class="form-group">
       <label>Mot de passe</label>
-      <input type="password" id="password" placeholder="••••••">
+      <input type="password" id="password" placeholder="Mot de passe">
     </div>
-    <button class="btn-primary" onclick="login()">Se connecter</button>
-    <button class="btn-secondary" onclick="toggleSignup()">Créer un compte</button>
-    
-    <div id="signupForm" class="hidden signup-toggle-form">
-      <div class="form-group">
-        <label>Nom de l'organisation</label>
-        <input type="text" id="orgName" placeholder="Sen No Sen">
-      </div>
-      <button class="btn-primary" onclick="signup()">S'inscrire</button>
-    </div>
+    <button onclick="login()">Se connecter</button>
   </div>
 
   <!-- Dashboard Screen -->
@@ -417,7 +350,7 @@
           <label>Date de début d'abonnement</label>
           <input type="date" id="startDate">
         </div>
-        <button class="btn-primary" onclick="addSubscriber()">✓ Ajouter l'abonné</button>
+        <button onclick="addSubscriber()">✓ Ajouter l'abonné</button>
       </div>
 
       <h2>📋 Liste des abonnés</h2>
@@ -444,13 +377,18 @@
   // ============================================
   const SUPABASE_URL = 'https://wojlwjplzlxkvqxmehdu.supabase.co';
   const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Indvamx3anBsemx4a3ZxeG1laGR1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTAwNjUwOTcsImV4cCI6MjEwNTY0MTA5N30.Ik7iEpdpSzCyGgMuPpy0oIokaWIWE9E7aE5t-9ePiMA';
-  const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-
+  
+  let supabase = null;
   let currentUser = null;
   let currentOrg = null;
 
+  // Initialiser Supabase
+  if (typeof window.supabase !== 'undefined') {
+    supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+  }
+
   // ============================================
-  // AUTH
+  // AUTH - Seul login (pas d'inscription)
   // ============================================
 
   async function login() {
@@ -462,58 +400,19 @@
       return;
     }
 
-    const { data, error } = await supabase.auth.signInWithPassword({ email, password });
-    if (error) {
-      showMessage('authMessage', error.message, 'error');
-      return;
+    try {
+      const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+      if (error) {
+        showMessage('authMessage', error.message, 'error');
+        return;
+      }
+
+      currentUser = data.user;
+      await loadUserOrg();
+      showDashboard();
+    } catch (e) {
+      showMessage('authMessage', e.message, 'error');
     }
-
-    currentUser = data.user;
-    await loadUserOrg();
-    showDashboard();
-  }
-
-  async function signup() {
-    const email = document.getElementById('email').value;
-    const password = document.getElementById('password').value;
-    const orgName = document.getElementById('orgName').value;
-
-    if (!email || !password || !orgName) {
-      showMessage('authMessage', 'Remplis tous les champs', 'error');
-      return;
-    }
-
-    const { data: authData, error: authError } = await supabase.auth.signUp({ email, password });
-    if (authError) {
-      showMessage('authMessage', authError.message, 'error');
-      return;
-    }
-
-    const { data: orgData, error: orgError } = await supabase
-      .from('organizations')
-      .insert([{ name: orgName }])
-      .select();
-
-    if (orgError) {
-      showMessage('authMessage', orgError.message, 'error');
-      return;
-    }
-
-    const { error: profileError } = await supabase
-      .from('profiles')
-      .insert([{
-        id: authData.user.id,
-        organization_id: orgData[0].id,
-        role: 'admin'
-      }]);
-
-    if (profileError) {
-      showMessage('authMessage', profileError.message, 'error');
-      return;
-    }
-
-    showMessage('authMessage', 'Compte créé! Connecte-toi.', 'success');
-    document.getElementById('signupForm').classList.add('hidden');
   }
 
   async function logout() {
@@ -524,7 +423,6 @@
     document.getElementById('dashScreen').classList.add('hidden');
     document.getElementById('email').value = '';
     document.getElementById('password').value = '';
-    document.getElementById('orgName').value = '';
   }
 
   async function loadUserOrg() {
@@ -535,7 +433,7 @@
       .single();
 
     if (error) {
-      showMessage('authMessage', 'Erreur lors du chargement', 'error');
+      showMessage('authMessage', 'Erreur: ' + error.message, 'error');
       return;
     }
 
@@ -668,7 +566,7 @@
 
     document.getElementById('shipmentsList').innerHTML = data.map(ship => `
       <div class="shipment-item">
-        <div class="shipment-info">
+        <div class="subscriber-info">
           <strong>${ship.subscribers.first_name} ${ship.subscribers.last_name}</strong><br>
           📅 ${formatDate(ship.scheduled_date)} | 
           📖 Mag #${ship.magazine_number} | 
@@ -679,7 +577,7 @@
             ${ship.status === 'pending' ? '⏳ En attente' : '✅ Envoyé'}
           </span>
         </div>
-        ${ship.status === 'pending' ? `<button class="btn-sent btn-secondary" onclick="markAsSent('${ship.id}')">Marqué envoyé</button>` : ''}
+        ${ship.status === 'pending' ? `<button class="btn-sent" onclick="markAsSent('${ship.id}')">Marqué envoyé</button>` : ''}
       </div>
     `).join('');
   }
@@ -716,10 +614,6 @@
     event.target.classList.add('active');
   }
 
-  function toggleSignup() {
-    document.getElementById('signupForm').classList.toggle('hidden');
-  }
-
   function showMessage(elementId, message, type) {
     const el = document.getElementById(elementId);
     el.innerHTML = `<div class="${type}">${message}</div>`;
@@ -742,10 +636,11 @@
   }
 
   // ============================================
-  // INIT
+  // INIT - Check session
   // ============================================
 
   async function init() {
+    if (!supabase) return;
     const { data: { user } } = await supabase.auth.getUser();
     if (user) {
       currentUser = user;
