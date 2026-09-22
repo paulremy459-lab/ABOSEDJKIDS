@@ -1,0 +1,672 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Judo Kids Manager</title>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+
+    .container {
+      width: 100%;
+      max-width: 1200px;
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(10px);
+      border-radius: 20px;
+      padding: 40px;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+    }
+
+    h1 {
+      color: #667eea;
+      margin-bottom: 30px;
+      text-align: center;
+    }
+
+    h2 {
+      color: #667eea;
+      margin-top: 30px;
+      margin-bottom: 15px;
+      font-size: 18px;
+    }
+
+    .auth-form {
+      background: rgba(255, 255, 255, 0.8);
+      padding: 30px;
+      border-radius: 15px;
+      max-width: 400px;
+      margin: 0 auto;
+    }
+
+    .form-group {
+      margin-bottom: 15px;
+    }
+
+    label {
+      display: block;
+      margin-bottom: 5px;
+      font-weight: 600;
+      color: #333;
+      font-size: 14px;
+    }
+
+    input[type="email"],
+    input[type="password"],
+    input[type="text"],
+    input[type="date"],
+    select {
+      width: 100%;
+      padding: 10px;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      font-size: 14px;
+    }
+
+    button {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      padding: 12px 24px;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: 600;
+      width: 100%;
+      margin-top: 10px;
+      font-size: 14px;
+    }
+
+    button:hover {
+      opacity: 0.9;
+    }
+
+    .tabs {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 30px;
+      border-bottom: 2px solid #eee;
+    }
+
+    .tab-button {
+      background: none;
+      border: none;
+      padding: 15px 20px;
+      cursor: pointer;
+      font-weight: 600;
+      color: #999;
+      border-bottom: 3px solid transparent;
+      width: auto;
+      font-size: 14px;
+    }
+
+    .tab-button.active {
+      color: #667eea;
+      border-bottom-color: #667eea;
+    }
+
+    .tab-content {
+      display: none;
+    }
+
+    .tab-content.active {
+      display: block;
+    }
+
+    .form-card {
+      background: rgba(102, 126, 234, 0.05);
+      padding: 20px;
+      border-radius: 15px;
+      margin-bottom: 20px;
+      border: 1px solid #eee;
+    }
+
+    .subscriber-list {
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+    }
+
+    .subscriber-item {
+      background: rgba(102, 126, 234, 0.1);
+      padding: 15px;
+      border-radius: 10px;
+      border-left: 4px solid #667eea;
+    }
+
+    .subscriber-name {
+      font-weight: 600;
+      color: #333;
+      margin-bottom: 8px;
+      font-size: 15px;
+    }
+
+    .subscriber-info {
+      font-size: 13px;
+      color: #666;
+      margin-bottom: 4px;
+    }
+
+    .shipment-group {
+      margin-bottom: 30px;
+    }
+
+    .shipment-date {
+      color: #667eea;
+      font-weight: 600;
+      margin-bottom: 15px;
+      font-size: 15px;
+    }
+
+    .shipment-item {
+      display: grid;
+      grid-template-columns: 1fr 100px 100px 120px auto 80px;
+      gap: 15px;
+      align-items: center;
+      padding: 12px 15px;
+      background: rgba(255, 255, 255, 0.9);
+      border-radius: 10px;
+      margin-bottom: 10px;
+      border-left: 4px solid #667eea;
+      font-size: 13px;
+    }
+
+    .shipment-name {
+      font-weight: 600;
+      color: #333;
+    }
+
+    .error {
+      background: #fee;
+      color: #c00;
+      padding: 10px;
+      border-radius: 5px;
+      margin-bottom: 15px;
+      font-size: 13px;
+    }
+
+    .success {
+      background: #efe;
+      color: #060;
+      padding: 10px;
+      border-radius: 5px;
+      margin-bottom: 15px;
+      font-size: 13px;
+    }
+
+    .logout-btn {
+      background: #999;
+      padding: 8px 16px;
+      font-size: 13px;
+      width: auto;
+    }
+
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 30px;
+    }
+
+    .status-badge {
+      display: inline-block;
+      padding: 4px 8px;
+      border-radius: 4px;
+      font-size: 11px;
+      font-weight: 600;
+    }
+
+    .status-pending {
+      background: #fff3cd;
+      color: #856404;
+    }
+
+    .status-sent {
+      background: #d4edda;
+      color: #155724;
+    }
+
+    .hidden {
+      display: none;
+    }
+
+    .loading {
+      text-align: center;
+      padding: 20px;
+      color: #999;
+      font-size: 14px;
+    }
+
+    .btn-sent {
+      width: auto;
+      padding: 4px 12px;
+      font-size: 12px;
+    }
+
+    p {
+      color: #666;
+      font-size: 14px;
+      margin-bottom: 20px;
+    }
+  </style>
+</head>
+<body>
+
+<div class="container" id="app">
+  <!-- Login Screen -->
+  <div id="authScreen" class="auth-form">
+    <h1>🥋 Judo Kids Manager</h1>
+    <div id="authMessage"></div>
+    <div class="form-group">
+      <label>Email</label>
+      <input type="email" id="email" placeholder="tonmail@example.com">
+    </div>
+    <div class="form-group">
+      <label>Mot de passe</label>
+      <input type="password" id="password" placeholder="••••••">
+    </div>
+    <button onclick="login()">Se connecter</button>
+    <button onclick="toggleSignup()" style="background: #999; margin-top: 5px;">Créer un compte</button>
+    <div id="signupForm" class="hidden" style="margin-top: 20px; padding-top: 20px; border-top: 1px solid #ddd;">
+      <div class="form-group">
+        <label>Nom de l'organisation</label>
+        <input type="text" id="orgName" placeholder="Sen No Sen">
+      </div>
+      <button onclick="signup()">S'inscrire</button>
+    </div>
+  </div>
+
+  <!-- Dashboard Screen -->
+  <div id="dashScreen" class="hidden">
+    <div class="header">
+      <h1>🥋 Judo Kids Manager</h1>
+      <button class="logout-btn" onclick="logout()">Déconnexion</button>
+    </div>
+
+    <div class="tabs">
+      <button class="tab-button active" onclick="switchTab('abonnes')">👥 Abonnés</button>
+      <button class="tab-button" onclick="switchTab('envois')">📦 Envois</button>
+    </div>
+
+    <!-- Onglet Abonnés -->
+    <div id="abonnes" class="tab-content active">
+      <div class="form-card">
+        <h2>➕ Ajouter un abonné</h2>
+        <div id="addMessage"></div>
+        <div class="form-group">
+          <label>Prénom</label>
+          <input type="text" id="firstName" placeholder="Jean">
+        </div>
+        <div class="form-group">
+          <label>Nom</label>
+          <input type="text" id="lastName" placeholder="Dupont">
+        </div>
+        <div class="form-group">
+          <label>Email</label>
+          <input type="email" id="subscriberEmail" placeholder="jean@example.com">
+        </div>
+        <div class="form-group">
+          <label>Adresse</label>
+          <input type="text" id="address" placeholder="123 Rue de la Paix, 75000 Paris">
+        </div>
+        <div class="form-group">
+          <label>Date de début d'abonnement</label>
+          <input type="date" id="startDate">
+        </div>
+        <button onclick="addSubscriber()">✓ Ajouter l'abonné</button>
+      </div>
+
+      <h2>📋 Liste des abonnés</h2>
+      <div id="subscribersList" class="subscriber-list loading">
+        Chargement...
+      </div>
+    </div>
+
+    <!-- Onglet Envois -->
+    <div id="envois" class="tab-content">
+      <h2>📦 Calendrier d'envois</h2>
+      <p>Les envois sont générés automatiquement au moment de créer un abonné. Cliquez sur "Marqué envoyé" pour mettre à jour le statut.</p>
+      
+      <div id="shipmentsList" class="loading">
+        Chargement...
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  // ============================================
+  // Supabase Config
+  // ============================================
+  const SUPABASE_URL = 'https://wojlwjplzlxkvqxmehdu.supabase.co';
+  const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Indvamx3anBsemx4a3ZxeG1laGR1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTAwNjUwOTcsImV4cCI6MjEwNTY0MTA5N30.Ik7iEpdpSzCyGgMuPpy0oIokaWIWE9E7aE5t-9ePiMA';
+  const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+  let currentUser = null;
+  let currentOrg = null;
+
+  // ============================================
+  // AUTH
+  // ============================================
+
+  async function login() {
+    const email = document.getElementById('email').value;
+    const password = document.getElementById('password').value;
+
+    if (!email || !password) {
+      showMessage('authMessage', 'Remplis email et mot de passe', 'error');
+      return;
+    }
+
+    const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+    if (error) {
+      showMessage('authMessage', error.message, 'error');
+      return;
+    }
+
+    currentUser = data.user;
+    await loadUserOrg();
+    showDashboard();
+  }
+
+  async function signup() {
+    const email = document.getElementById('email').value;
+    const password = document.getElementById('password').value;
+    const orgName = document.getElementById('orgName').value;
+
+    if (!email || !password || !orgName) {
+      showMessage('authMessage', 'Remplis tous les champs', 'error');
+      return;
+    }
+
+    const { data: authData, error: authError } = await supabase.auth.signUp({ email, password });
+    if (authError) {
+      showMessage('authMessage', authError.message, 'error');
+      return;
+    }
+
+    const { data: orgData, error: orgError } = await supabase
+      .from('organizations')
+      .insert([{ name: orgName }])
+      .select();
+
+    if (orgError) {
+      showMessage('authMessage', orgError.message, 'error');
+      return;
+    }
+
+    const { error: profileError } = await supabase
+      .from('profiles')
+      .insert([{
+        id: authData.user.id,
+        organization_id: orgData[0].id,
+        role: 'admin'
+      }]);
+
+    if (profileError) {
+      showMessage('authMessage', profileError.message, 'error');
+      return;
+    }
+
+    showMessage('authMessage', 'Compte créé! Connecte-toi.', 'success');
+    document.getElementById('signupForm').classList.add('hidden');
+  }
+
+  async function logout() {
+    await supabase.auth.signOut();
+    currentUser = null;
+    currentOrg = null;
+    document.getElementById('authScreen').classList.remove('hidden');
+    document.getElementById('dashScreen').classList.add('hidden');
+  }
+
+  async function loadUserOrg() {
+    const { data, error } = await supabase
+      .from('profiles')
+      .select('organization_id')
+      .eq('id', currentUser.id)
+      .single();
+
+    if (error) {
+      showMessage('authMessage', 'Erreur lors du chargement', 'error');
+      return;
+    }
+
+    currentOrg = data.organization_id;
+  }
+
+  // ============================================
+  // SUBSCRIBERS
+  // ============================================
+
+  async function addSubscriber() {
+    const firstName = document.getElementById('firstName').value;
+    const lastName = document.getElementById('lastName').value;
+    const email = document.getElementById('subscriberEmail').value;
+    const address = document.getElementById('address').value;
+    const startDate = document.getElementById('startDate').value;
+
+    if (!firstName || !lastName || !email || !startDate) {
+      showMessage('addMessage', 'Remplis tous les champs requis', 'error');
+      return;
+    }
+
+    const { data: subData, error: subError } = await supabase
+      .from('subscribers')
+      .insert([{
+        organization_id: currentOrg,
+        first_name: firstName,
+        last_name: lastName,
+        email: email,
+        address: address,
+        subscription_start_date: startDate
+      }])
+      .select();
+
+    if (subError) {
+      showMessage('addMessage', subError.message, 'error');
+      return;
+    }
+
+    const subscriberId = subData[0].id;
+    const shipments = generateShipments(subscriberId, startDate);
+    const { error: shipError } = await supabase
+      .from('shipments')
+      .insert(shipments);
+
+    if (shipError) {
+      showMessage('addMessage', shipError.message, 'error');
+      return;
+    }
+
+    showMessage('addMessage', '✓ Abonné ajouté avec 12 envois générés!', 'success');
+    clearForm();
+    loadSubscribers();
+    loadShipments();
+  }
+
+  function generateShipments(subscriberId, startDate) {
+    const start = new Date(startDate);
+    const startMonth = start.getMonth();
+    const shipments = [];
+
+    for (let i = 1; i <= 12; i++) {
+      const shipDate = new Date(start);
+      shipDate.setMonth(shipDate.getMonth() + (i - 1) * 2);
+
+      const magazineNumber = ((Math.floor(startMonth / 2) + (i - 1)) % 6) + 1;
+      const posterNumber = (((i - 1) % 6) + 1);
+      const stickerPair = Math.floor((i - 1) / 2) % 6;
+
+      shipments.push({
+        subscriber_id: subscriberId,
+        shipment_number: i,
+        scheduled_date: shipDate.toISOString().split('T')[0],
+        magazine_number: magazineNumber,
+        poster_number: posterNumber,
+        sticker_pair: stickerPair,
+        status: 'pending'
+      });
+    }
+
+    return shipments;
+  }
+
+  async function loadSubscribers() {
+    const { data, error } = await supabase
+      .from('subscribers')
+      .select('*')
+      .eq('organization_id', currentOrg)
+      .order('created_at', { ascending: false });
+
+    if (error) {
+      console.error(error);
+      return;
+    }
+
+    const html = data.length === 0 
+      ? '<p style="color: #999; padding: 20px;">Aucun abonné encore</p>'
+      : data.map(sub => `
+        <div class="subscriber-item">
+          <div class="subscriber-name">${sub.first_name} ${sub.last_name}</div>
+          <div class="subscriber-info">📧 ${sub.email || 'N/A'}</div>
+          <div class="subscriber-info">📍 ${sub.address || 'N/A'}</div>
+          <div class="subscriber-info">📅 Depuis le ${formatDate(sub.subscription_start_date)}</div>
+        </div>
+      `).join('');
+
+    document.getElementById('subscribersList').innerHTML = html;
+  }
+
+  // ============================================
+  // SHIPMENTS
+  // ============================================
+
+  async function loadShipments() {
+    const { data, error } = await supabase
+      .from('shipments')
+      .select('*, subscribers(first_name, last_name)')
+      .in('subscriber_id', (await supabase
+        .from('subscribers')
+        .select('id')
+        .eq('organization_id', currentOrg)).data.map(s => s.id))
+      .order('scheduled_date', { ascending: true });
+
+    if (error || !data) {
+      document.getElementById('shipmentsList').innerHTML = '<p style="color: #999;">Aucun envoi planifié</p>';
+      return;
+    }
+
+    const grouped = {};
+    data.forEach(ship => {
+      if (!grouped[ship.scheduled_date]) {
+        grouped[ship.scheduled_date] = [];
+      }
+      grouped[ship.scheduled_date].push(ship);
+    });
+
+    const html = Object.entries(grouped).length === 0
+      ? '<p style="color: #999;">Aucun envoi planifié</p>'
+      : Object.entries(grouped).map(([date, ships]) => `
+        <div class="shipment-group">
+          <div class="shipment-date">📅 ${formatDate(date)}</div>
+          ${ships.map(ship => `
+            <div class="shipment-item">
+              <div class="shipment-name">${ship.subscribers.first_name} ${ship.subscribers.last_name}</div>
+              <div>📰 Magazine #${ship.magazine_number}</div>
+              <div>🎨 Poster #${ship.poster_number}</div>
+              <div>🎟️ Stickers ${ship.sticker_pair * 2 + 1}-${ship.sticker_pair * 2 + 2}</div>
+              <div><span class="status-badge ${ship.status === 'sent' ? 'status-sent' : 'status-pending'}">${ship.status}</span></div>
+              <button class="btn-sent" onclick="markAsSent('${ship.id}')">Envoyé</button>
+            </div>
+          `).join('')}
+        </div>
+      `).join('');
+
+    document.getElementById('shipmentsList').innerHTML = html;
+  }
+
+  async function markAsSent(shipmentId) {
+    const { error } = await supabase
+      .from('shipments')
+      .update({ status: 'sent', sent_at: new Date().toISOString() })
+      .eq('id', shipmentId);
+
+    if (error) console.error(error);
+    else loadShipments();
+  }
+
+  // ============================================
+  // UI
+  // ============================================
+
+  function showDashboard() {
+    document.getElementById('authScreen').classList.add('hidden');
+    document.getElementById('dashScreen').classList.remove('hidden');
+    loadSubscribers();
+    loadShipments();
+  }
+
+  function switchTab(tab) {
+    document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+    document.querySelectorAll('.tab-button').forEach(el => el.classList.remove('active'));
+    document.getElementById(tab).classList.add('active');
+    event.target.classList.add('active');
+  }
+
+  function toggleSignup() {
+    document.getElementById('signupForm').classList.toggle('hidden');
+  }
+
+  function showMessage(elementId, message, type) {
+    const el = document.getElementById(elementId);
+    el.innerHTML = `<div class="${type}">${message}</div>`;
+  }
+
+  function clearForm() {
+    document.getElementById('firstName').value = '';
+    document.getElementById('lastName').value = '';
+    document.getElementById('subscriberEmail').value = '';
+    document.getElementById('address').value = '';
+    document.getElementById('startDate').value = '';
+  }
+
+  function formatDate(dateStr) {
+    return new Date(dateStr).toLocaleDateString('fr-FR', { 
+      year: 'numeric', 
+      month: 'long', 
+      day: 'numeric' 
+    });
+  }
+
+  // ============================================
+  // INIT
+  // ============================================
+
+  async function init() {
+    const { data: { user } } = await supabase.auth.getUser();
+    if (user) {
+      currentUser = user;
+      await loadUserOrg();
+      showDashboard();
+    }
+  }
+
+  init();
+</script>
+
+</body>
+</html>
